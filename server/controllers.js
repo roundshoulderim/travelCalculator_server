@@ -1,7 +1,7 @@
 const models = require('./models');
 
 const getSearchKeyword = function(req, res) {
-    console.log(req.query)
+    //console.log(req.query)
 
     const cityCode = req.query.cityCode; //LHR
     const departureDate = req.query.departureDate; //2019-11-01
@@ -9,12 +9,9 @@ const getSearchKeyword = function(req, res) {
     const stop = req.query.stop; //1
     const cityName = req.query.cityName; //London
     
-    models.getSearchKeyword(cityCode, departureDate, arrivalDate, stop, cityName)
-        // if(err) {
-        //     res.status(500).send(err);
-        // }
-        // res.status(200).send(results);
-
+    models.getSearchKeyword(cityCode, departureDate, arrivalDate, stop, cityName,(data)=>{
+        res.status(200).send(data);
+    })
    };
 
    module.exports = {getSearchKeyword}
