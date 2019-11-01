@@ -1,7 +1,9 @@
 const express = require("express");
 const sequelize = require('../models/index').sequelize;
+const routes = require('./routes');
 
 const app = express();
+app.use('/', routes);
 
 app.listen(3000,()=>{
     console.log('listening on 3000 port')
@@ -12,10 +14,3 @@ app.get('/',(req,res)=>{
 })
 
 sequelize.sync();
-
-/*
-var usersRouter = require('./routes/users');
-var sequelize = require('./models/index').sequelize;
-var app = express();
-sequelize.sync();
-*/

@@ -1,18 +1,18 @@
 module.exports =(sequelize, DataTypes) => {
-    return sequelize.define('iata', {
-      cityKor: {
+    return sequelize.define('meals', {
+      iataCode: {
         type: DataTypes.STRING(20),
         allowNull: false,
         unique: false,
       },
-      cityEng: {
-        type: DataTypes.STRING(20),
+      onemeal : {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      iataCode: {
-        type: DataTypes.STRING(20),
+      onedaymeal : {
+        type: DataTypes.INTEGER,
         allowNull: false,
-      },
+      }
     }, {
         timestamps: false,
       });
