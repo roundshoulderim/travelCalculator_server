@@ -4,7 +4,7 @@ const routes = require("./routes");
 const cors = require("cors");
 
 const app = express();
-app.use("/", routes);
+
 app.use(
   cors({
     origin: ["http://localhost:3000"],
@@ -12,6 +12,8 @@ app.use(
     crudentials: true
   })
 );
+
+app.use("/", routes);
 
 app.listen(5000, () => {
   console.log("listening on 5000 port");
