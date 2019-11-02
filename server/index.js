@@ -1,21 +1,18 @@
 const express = require("express");
-const sequelize = require('../models/index').sequelize;
+const sequelize = require("../models/index").sequelize;
+const routes = require("./routes");
+const cors = require("cors");
 
 const app = express();
+app.use("/", routes);
+app.use(cors());
 
-app.listen(3000,()=>{
-    console.log('listening on 3000 port')
-})
+app.listen(5000, () => {
+  console.log("listening on 5000 port");
+});
 
-app.get('/',(req,res)=>{
-    res.send('hello world')
-})
+app.get("/", (req, res) => {
+  res.send("hello world");
+});
 
 sequelize.sync();
-
-/*
-var usersRouter = require('./routes/users');
-var sequelize = require('./models/index').sequelize;
-var app = express();
-sequelize.sync();
-*/

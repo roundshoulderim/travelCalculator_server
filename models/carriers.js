@@ -1,18 +1,25 @@
 module.exports =(sequelize, DataTypes) => {
-    return sequelize.define('iata', {
-      cityKor: {
+    return sequelize.define('carriers', {
+      airline: {
         type: DataTypes.STRING(20),
         allowNull: false,
-        unique: false,
+        unique: false
       },
-      cityEng: {
+      nation : {
         type: DataTypes.STRING(20),
         allowNull: false,
+        unique: false
       },
       iataCode: {
         type: DataTypes.STRING(20),
         allowNull: false,
+        unique: false
       },
+      logo : {
+        type : DataTypes.STRING,
+        allowNull : false,
+        unique: false
+      }
     }, {
         timestamps: false,
       });
