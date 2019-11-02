@@ -30,18 +30,19 @@ console.log("실행됐니?")
 
     let currency = 0;
     
-    var currencypromise = db.Currency.findOne({
-        where : {iataCode : cityCode}
-    }).
-    then((data) =>{ 
-        currency = data.dataValues.krw;
-        console.log('currency-------', currency);
-    });
+    // var currencypromise = db.Currency.findOne({
+    //     where : {iataCode : cityCode}
+    // }).
+    // then((data) =>{ 
+    //     currency = data.dataValues.krw;
+    //     console.log('currency-------', currency);
+    // });
 
     var mealpromise = db.Meal.findOne({
         where : {iataCode : cityCode} 
     }).
     then((data)=> {
+        currency = data.dataValues.krw;
         response.estimate.restaurant = data.dataValues.onedaymeal
     })
 
@@ -91,22 +92,31 @@ console.log("실행됐니?")
 
             //estimate_flight 평균가격 산정
             let sum=0;
-            for(let i=20; i<results.data.length; i++){
+            let count = parseInt(results.data.length*0.2);
+
+            if(results.data.length < 10) {
+              count = 0;
+            }
+
+            for(let i= count; i<results.data.length; i++){
               sum += Number(results.data[i].price.total);
             }
-            var average = sum/(results.data.length-20);
+            var average = sum/(results.data.length - count);
+            console.log(`[LENGTH] : ${results.data.length} / [COUNT] : ${count}`);
             console.log('average-------------', average);
             response.estimate.flight = average;
 
 
             //상세페이지 정보 일단 1개만
 
+            for(let i=0; i<=2; i++){
             let body = {};
-            body.offerid = 1;
+            body.offerid = i;
             body.itineraries = [];
-            body.price = results.data[0].price.total;
-            let carrierCode = results.data[0].itineraries[0].segments[0].carrierCode 
-            
+            body.price = results.data[i].price.total;
+            let carrierCode = results.data[i].itineraries[0].segments[0].carrierCode 
+
+        
             //check!!!!!!
             //db 가서 로고, 항공사 이름 찾아옴
             db.Carrier.findOne({
@@ -135,102 +145,105 @@ console.log("실행됐니?")
             body.itineraries.push(come);
 
             //가는 비행기
-            go.duration = results.data[0].itineraries[0].duration;
-            go.stop = results.data[0].itineraries[0].segments.length-1;
+            go.duration = results.data[i].itineraries[0].duration;
+            go.stop = results.data[i].itineraries[0].segments.length-1;
             go.segments = [];
 
             //아래 코드 리팩토링 해야함!
-            //경유 있을 때 
-            if(go.stop>0) {
-            let segment1 = {};
-            segment1Data = results.data[0].itineraries[0].segments[0]
-            segment1.departure = {};
-            segment1.departure.city = "Seoul", //공항코드 통해서 변환? 
-            segment1.departure.date = segment1Data.departure.at;
-            segment1.arrival = {};
-            segment1.arrival.city = "advanced",
-            segment1.arrival.date = segment1Data.arrival.at;
-            segment1.duration = segment1Data.duration;
-            go.segments.push(segment1);
 
+              
+              segment1Data = results.data[i].itineraries[0].segments[0]
+              let segment1 = {
+                departure : {
+                  city : "Seoul", 
+                  date : segment1Data.departure.at
+                },
+                arrival : {
+                  city : "advanced",
+                  date : segment1Data.arrival.at
+                },
+                duration : segment1Data.duration
+              };
 
-            let segment2 = {};
-            segment2Data = results.data[0].itineraries[0].segments[1]
-            segment2.departure = {};
-            segment2.departure.city = "advanced", 
-            segment2.departure.date = segment2Data.departure.at;
-            segment2.arrival = {};
-            segment2.arrival.city = cityName, 
-            segment2.arrival.date = segment2Data.arrival.at;
-            segment2.duration = segment2Data.duration;
-            go.segments.push(segment2);
-            } 
+              go.segments.push(segment1);
 
-            //경유 없을 때 
-            else if(go.stop<=0) { 
-            let segment1 = {};
-            segment1Data = results.data[0].itineraries[0].segments[0]
-            segment1.departure = {};
-            segment1.departure.city = "Seoul", //공항코드 통해서 변환? 
-            segment1.departure.date = segment1Data.departure.at;
-            segment1.arrival = {};
-            segment1.arrival.city = cityName,
-            segment1.arrival.date = segment1Data.arrival.at;
-            segment1.duration = segment1Data.duration;
-            go.segments.push(segment1);
-
+              //경유 없을 때 
+            if(go.stop<=0) { 
+              go.segments[0].arrival = {
+                city : cityName,
+                date : segment1Data.arrival.at
+              }
             }
+
+            if(go.stop>0){
+            segment2Data = results.data[i].itineraries[0].segments[1]
+           
+            let segment2 = {
+              departure : {
+                city : "advanced", 
+                date : segment2Data.departure.at
+              },
+              arrival : {
+                city : cityName,
+                date : segment2Data.arrival.at
+              },
+              duration : segment2Data.duration
+            };
+            go.segments.push(segment2);
+          }
+
+      
 
 
             //오는 비행기
-            come.duration = results.data[0].itineraries[1].duration;
-            come.stop = results.data[0].itineraries[1].segments.length-1;
+            come.duration = results.data[i].itineraries[1].duration;
+            come.stop = results.data[i].itineraries[1].segments.length-1;
             come.segments = [];
 
             //경유 있을 때 
-            if(come.stop>0) {
-            let segment3 = {};
-            segment3Data = results.data[0].itineraries[1].segments[0]
-            segment3.departure = {};
-            segment3.departure.city = "Seoul", 
-            segment3.departure.date = segment3Data.departure.at;
-            segment3.arrival = {};
-            segment3.arrival.city = "advanced", 
-            segment3.arrival.date = segment3Data.arrival.at;
-            segment3.duration = segment3Data.duration;
-            come.segments.push(segment3);
-
-            let segment4 = {};
-            segment4Data = results.data[0].itineraries[1].segments[1]
-            segment4.departure = {};
-            segment4.departure.city = "advanced", 
-            segment4.departure.date = segment4Data.at;
-            segment4.arrival = {};
-            segment4.arrival.city = cityName, 
-            segment4.arrival.date = segment4Data.at;
-            segment4.duration = segment4Data.duration;
-            come.segments.push(segment4);
-            }
-
-            //경유 없을 때 
-            else if(come.stop<=0){
-
-            let segment3 = {};
-            segment3Data = results.data[0].itineraries[1].segments[0]
-            segment3.departure = {};
-            segment3.departure.city = cityName, 
-            segment3.departure.date = segment3Data.departure.at;
-            segment3.arrival = {};
-            segment3.arrival.city = "Seoul", 
-            segment3.arrival.date = segment3Data.arrival.at;
-            segment3.duration = segment3Data.duration;
-            come.segments.push(segment3);
-            }
-
             
-            console.log('response-----------',response);
-            // return response;
-            /* callback(response); */
+              segment3Data = results.data[i].itineraries[1].segments[0]
+              let segment3 = {
+                departure : {
+                  city : cityName, 
+                  date : segment3Data.departure.at
+                },
+                arrival : {
+                  city : "advanced",
+                  date : segment3Data.arrival.at
+                },
+                duration : segment3Data.duration
+              };
+
+              come.segments.push(segment3);
+
+              if(come.stop<=0) { 
+                come.segments[0].arrival = {
+                  city : "Seoul",
+                  date : segment3Data.arrival.at
+                }
+              }
+
+              if(come.stop>0){
+
+              segment4Data = results.data[i].itineraries[1].segments[1]
+             
+              let segment4 = {
+                departure : {
+                  city : "advanced", 
+                  date : segment4Data.departure.at
+                },
+                arrival : {
+                  city : "Seoul",
+                  date : segment4Data.arrival.at
+                },
+                duration : segment4Data.duration
+              };
+              come.segments.push(segment4);
+            }
+          
+          }
+          
             }).catch(error =>{console.log(error)});
 
             // 항공권 끝남

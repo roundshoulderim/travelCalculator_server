@@ -12,6 +12,21 @@ module.exports =(sequelize, DataTypes) => {
       onedaymeal : {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      iso : {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        unique: false
+      },
+      krw : {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        unique: false
+      },
+      usd : {
+        type : DataTypes.FLOAT,
+        allowNull : false,
+        unique: false
       }
     }, {
         timestamps: false,
