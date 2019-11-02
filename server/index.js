@@ -8,7 +8,7 @@ app.use("/", routes);
 app.use(
   cors({
     origin: ["http://localhost:3000"],
-    method: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST"],
     crudentials: true
   })
 );
