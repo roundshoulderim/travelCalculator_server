@@ -1,11 +1,22 @@
 var db = require("../models/index");
 const fetch = require("node-fetch");
-var accessdata =require('../accessdata');
+//var accessdata =require('../accessdata');
 
 const getSearchKeyword = function(cityCode, departure, arrival, stop, cityName,callback) {
-  console.log('accessdata---------',accessdata);
 
-console.log("실행됐니?")
+  var ama = undefined;
+  var amas = undefined;
+  var ZOMATO_API_KEY = undefined;
+  
+  db.Apikey.findAll() 
+  .then((data)=> { 
+     ama = data[0].dataValues.key;
+     amas = data[1].dataValues.key;
+     ZOMATO_API_KEY = data[2].dataValues.key;
+  })
+  .then(()=>{
+   
+
     var response = {};
     response.estimate = {};
     response.details = {};
@@ -46,12 +57,8 @@ console.log("실행됐니?")
         response.estimate.restaurant = data.dataValues.onedaymeal
     })
 
-    
-    var clientId = accessdata.AMADEUS_API_KEY;
-    var clientSecret = accessdata.AMADEUS_API_SECRET;
-
     var flightpromise = fetch("https://test.api.amadeus.com/v1/security/oauth2/token", {
-        body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+        body: `grant_type=client_credentials&client_id=YgxTJ1tGQDlG3aGH94nAoqCRPqpthHd4&client_secret=${amas.slice(0, (amas.length-1))}`,
         headers: {
         "Content-Type": "application/x-www-form-urlencoded"
     },
@@ -59,7 +66,10 @@ console.log("실행됐니?")
     })
     .then(res => res.json())
     .then(data => {
+      console.log(data);
+     
         var token = data.access_token;
+
 
         // 항공권 코드
 
@@ -87,8 +97,7 @@ console.log("실행됐니?")
         }
         }).then(resp => resp.json())
         .then((results) =>{
-
-//console.log('results.data----------', results)
+  
 
             //estimate_flight 평균가격 산정
             let sum=0;
@@ -123,13 +132,12 @@ console.log("실행됐니?")
                 where : {iatacode : carrierCode}
             }).
             then((data) =>{ 
-                console.log('db 들어왔니?');
                 console.log(data.dataValues.airline);
-                console.log(data.dataValues.logo)
+               
                 body.airline = data.dataValues.airline
                 body.logo = data.dataValues.logo;
                 response.details.flight.push(body);
-                console.log(body.airline)
+              
             })
 
             // db.Carrier.findOne({
@@ -307,7 +315,7 @@ console.log("실행됐니?")
     var restaurantpromise = fetch(`https://developers.zomato.com/api/v2.1/cities?q=${cityName}`, {
     headers: {
       Accept: "application/json",
-      "User-Key": "b8cc3b8b0a85afed047f030fb52dc15f"
+      "User-Key": ZOMATO_API_KEY
     }
   })
     .then(res => res.json())
@@ -318,7 +326,8 @@ console.log("실행됐니?")
         {
           headers: {
             Accept: "application/json",
-            "User-Key": "b8cc3b8b0a85afed047f030fb52dc15f"
+            // "User-Key": "b8cc3b8b0a85afed047f030fb52dc15f"
+            "User-Key": ZOMATO_API_KEY
           }
         }
       )
@@ -360,6 +369,9 @@ console.log("실행됐니?")
   //     callback(response)
       
   //   })
+
+})
+.catch((err) =>console.log(err))
 
 }
 

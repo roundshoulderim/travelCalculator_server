@@ -1,25 +1,25 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
+    "username": "admin",
+    "password": "travelflight",
     "database": "travelcalculator",
-    "host": "127.0.0.1",
+    "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
     "operatorsAliases": false
   },
   "test": {
-    "username": "root",
-    "password": null,
+    "username": "admin",
+    "password": "travelflight",
     "database": "travelcalculator",
-    "host": "127.0.0.1",
+    "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
     "operatorsAliases": false
   },
   "production": {
-    "username": "root",
-    "password": null,
+    "username": "admin",
+    "password": "travelflight",
     "database": "travelcalculator",
-    "host": "127.0.0.1",
+    "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
     "operatorsAliases": false
   }
