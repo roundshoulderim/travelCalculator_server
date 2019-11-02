@@ -34,7 +34,8 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db.Iata = require('./iata')(sequelize, Sequelize);
+db.Carrier = require('./carriers')(sequelize, Sequelize);
+db.Meal = require('./meals')(sequelize, Sequelize);
 
 
 module.exports = db;
