@@ -5,8 +5,8 @@ const routes = require('./routes');
 const app = express();
 app.use('/', routes);
 
-app.listen(3000,()=>{
-    console.log('listening on 3000 port')
+app.listen(5000,()=>{
+    console.log('listening on 5000 port')
 })
 
 app.get('/',(req,res)=>{
