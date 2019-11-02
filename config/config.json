@@ -4,6 +4,7 @@
     "password": "travelflight",
     "database": "travelcalculator",
     "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
+    "port": "13306",
     "dialect": "mysql",
     "operatorsAliases": false
   },
@@ -12,6 +13,7 @@
     "password": "travelflight",
     "database": "travelcalculator",
     "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
+    "port": "13306",
     "dialect": "mysql",
     "operatorsAliases": false
   },
@@ -20,6 +22,7 @@
     "password": "travelflight",
     "database": "travelcalculator",
     "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
+    "port": "13306",
     "dialect": "mysql",
     "operatorsAliases": false
   }
