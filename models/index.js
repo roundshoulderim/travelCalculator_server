@@ -36,6 +36,6 @@ db.Sequelize = Sequelize;
 
 db.Carrier = require('./carriers')(sequelize, Sequelize);
 db.Meal = require('./meals')(sequelize, Sequelize);
-
+db.Apikey = require('./apikeys')(sequelize, Sequelize);
 
 module.exports = db;
