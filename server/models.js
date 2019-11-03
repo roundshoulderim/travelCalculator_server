@@ -2,7 +2,7 @@ var db = require("../models/index");
 const fetch = require("node-fetch");
 //var accessdata =require('../accessdata');
 
-const getSearchKeyword = function(
+const getSearchKeyword = function (
   cityCode,
   departure,
   arrival,
@@ -291,7 +291,9 @@ const getSearchKeyword = function(
                     photo:
                       "http://nomad-design-lifestyle-hotel.basel-hotels.net/data/Photos/767x460/7074/707435/707435914.JPEG",
                     price:
-                      Number(result.data[i].offers[0].price.total) * currency
+                      Number(result.data[i].offers[0].price.total) * currency,
+                    address: result.data[i].hotel.address.cityName + ' ' + result.data[i].hotel.address.lines[0],
+                    room: result.data[i].offers[0].room.typeEstimated.category.replace(/\_/g, ` `)
                   };
                 } else {
                   response.details.hotel[i] = {
@@ -395,14 +397,14 @@ const getSearchKeyword = function(
 
 module.exports = { getSearchKeyword };
 
-/* 
+/*
 
 let a = fetch("").then.then
 let b = fetch("").then.then
 promise.all([a,b]).then()
 
 promise all [항공패치, 호텔패치, 식당데이터베이스다녀오기] . total 계산
-estimate : 
+estimate :
 
 => response 할 객체
 --- 준 글로벌 ---
