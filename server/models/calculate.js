@@ -596,7 +596,7 @@ const getSearchKeyword = function (
                   .then(data => {
                     console.log(`[검색 시 트렌드 DB 업데이트] [조합코드] keyword : ${keyword}, gender : ${gender}, iataCode : ${cityName}`)
                     console.log('[검색 시 트렌드 DB 업데이트] [도시명 및 카운트]', data.dataValues)
-                    console.log('count : ', count);
+
                     let count = data.dataValues.count;
                     count = count + 1;
                     console.log('count updated : ', count);
