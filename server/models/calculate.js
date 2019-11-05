@@ -73,6 +73,7 @@ const getSearchKeyword = function (
         currency = data.dataValues.krw;
         response.estimate.restaurant = data.dataValues.onedaymeal;
         hotelaverage = data.dataValues.hotel;
+        response.cityphoto = data.dataValues.photo;
       });
 
       // async function flightpromise() {
