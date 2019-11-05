@@ -87,7 +87,7 @@ const getSearchKeyword = function (
       var flightpromise = fetch(
         "https://test.api.amadeus.com/v1/security/oauth2/token",
         {
-          body: `grant_type=client_credentials&client_id=${AMADEUS_API_ID.slice(0, AMADEUS_API_ID.length - 1)}&client_secret=${AMADEUS_API_KEY.slice(0, AMADEUS_API_KEY.length - 1)}`,
+          body: `grant_type=client_credentials&client_id=${AMADEUS_API_ID}&client_secret=${AMADEUS_API_KEY}`,
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
@@ -618,7 +618,7 @@ const getSearchKeyword = function (
         {
           headers: {
             Accept: "application/json",
-            "User-Key": ZOMATO_API_KEY.slice(0, ZOMATO_API_KEY.length - 1)
+            "User-Key": ZOMATO_API_KEY
           }
         }
       )
@@ -631,7 +631,7 @@ const getSearchKeyword = function (
               headers: {
                 Accept: "application/json",
                 // "User-Key": "b8cc3b8b0a85afed047f030fb52dc15f"
-                "User-Key": ZOMATO_API_KEY.slice(0, ZOMATO_API_KEY.length - 1)
+                "User-Key": ZOMATO_API_KEY
               }
             }
           )
