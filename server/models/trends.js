@@ -36,7 +36,7 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
 
                     var GOOGLE_KEY = data.dataValues.key
 
-                    console.log(GOOGLE_KEY)
+                    console.log(GOOGLE_KEY.length);
 
                     const option = {
                         query: `${keyword_string}+in+${trend.city}`, // 키워드 in 도시
@@ -48,8 +48,12 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
                             qs: option
                         },
                         function (err, res, body) {
+                            if (err) {
+                                console.log(err);
+                            }
+
                             let json = JSON.parse(body); //json으로 파싱
-                            // console.log(json);
+                            console.log(json);
                             var arr = [];
                             var arr2 = [];
                             for (let i = 0; i < json.results.length; i++) {
