@@ -16,15 +16,15 @@ const getSearchKeyword = function (
   var AMADEUS_API_KEY = undefined;
   var ZOMATO_API_KEY = undefined;
 
-  console.log(` **** response 어떻게 분해되어서 오는거니? *** cityCode : ${cityCode} departure : ${departure} arrival : ${arrival} cityName : ${cityName} keyword : ${keyword} age : ${age} gender : ${gender}`)
+  console.log(`[response 분해] cityCode : ${cityCode} departure : ${departure} arrival : ${arrival} cityName : ${cityName} keyword : ${keyword} age : ${age} gender : ${gender}`)
 
   db.Apikey.findAll()
     .then(data => { // DB apikeys 테이블에서 각 API 의 key 정보를 받아온다.
       //ama = data[0].dataValues.key;
-      AMADEUS_API_KEY = data[0].dataValues.key;
-      ZOMATO_API_KEY = data[1].dataValues.key;
-      console.log('AMADEUS_API_KEY : ', AMADEUS_API_KEY);
-      console.log('ZOMATO_API_KEY : ', ZOMATO_API_KEY);
+      AMADEUS_API_ID = data[0].dataValues.key;
+      AMADEUS_API_KEY = data[1].dataValues.key;
+      ZOMATO_API_KEY = data[2].dataValues.key;
+
     })
     .then(() => {
       var response = {}; // response 로 내려줄 object 틀을 잡아준다.
@@ -67,7 +67,7 @@ const getSearchKeyword = function (
       //     console.log('currency-------', currency);
       // });
 
-      var mealpromise = db.Meal.findOne({ // request 의 iataCode (도시별 공항 코드) 정보를 이용하여 DB로부터 여행지별 환율, 식비, 숙박비 정보를 가져온다. (숙박비 정보는 호텔 API 가 호텔 정보를 받아오지 못할 경우 사용한다)
+      db.Meal.findOne({ // request 의 iataCode (도시별 공항 코드) 정보를 이용하여 DB로부터 여행지별 환율, 식비, 숙박비 정보를 가져온다. (숙박비 정보는 호텔 API 가 호텔 정보를 받아오지 못할 경우 사용한다)
         where: { iataCode: cityCode }
       }).then(data => {
         currency = data.dataValues.krw;
@@ -82,10 +82,12 @@ const getSearchKeyword = function (
       //   return await flightresult.json
       // }
 
+
+
       var flightpromise = fetch(
         "https://test.api.amadeus.com/v1/security/oauth2/token",
         {
-          body: `grant_type=client_credentials&client_id=YgxTJ1tGQDlG3aGH94nAoqCRPqpthHd4&client_secret=${AMADEUS_API_KEY}`,
+          body: `grant_type=client_credentials&client_id=${AMADEUS_API_ID.slice(0, AMADEUS_API_ID.length - 1)}&client_secret=${AMADEUS_API_KEY.slice(0, AMADEUS_API_KEY.length - 1)}`,
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
@@ -124,184 +126,370 @@ const getSearchKeyword = function (
             }).then(resp => resp.json())
             .then((results) => {
               console.log(`[항공] [총 data] 결과 없니 설마? `, results);
-              let flightarr = [0, 1, 2];
-              let nonstopsum = 0;
-              let nonstopcount = 0;
 
-              for (let i = 0; i < results.data.length; i++) {
-                if (results.data[i].itineraries[0].segments.length === 1) {
-                  console.log(`[항공] [직항있음!]`);
+              if (!results.data) {
+                response.estimate.flight = 1000000;
+                response.estimate.nonstopflight = 2000000;
 
-                  if (flightarr[0] === 0) {
-                    flightarr = [i, 0, 1];
+                // response.details.flight[0] = {};
+                // response.details.flight[0].offerid = 1;
+                // response.details.flight[0].itineraries = []
+                // response.details.flight[0].price = 1000000;
+                // response.details.flight[0].airline = "대한항공"
+
+
+                response.details.flight = [
+                  {
+                    "offerid": 1,
+                    "itineraries": [
+                      {
+                        "duration": "20H 10M",
+                        "stop": "0",
+                        "segments": [
+                          {
+                            "daparture": {
+                              "city": "Seoul",
+                              "date": "2019-11-01 23:40:00"
+                            },
+                            "arrival": {
+                              "city": "London",
+                              "date": "2019-11-02 21:00:00"
+                            },
+                            "duration": "13H 10M"
+                          }
+                        ]
+                      },
+                      {
+                        "duration": "0",
+                        "segments": [
+                          {
+                            "daparture": {
+                              "city": "London",
+                              "date": "2019-11-03 23:40:00"
+                            },
+                            "arrival": {
+                              "city": "Seoul",
+                              "date": "2019-11-04 21:00:00"
+                            },
+                            "duration": "13H 10M"
+                          }
+                        ]
+                      }
+                    ],
+                    "price": 100000,
+                    "airline": "대한항공",
+                    "logo": "https://www.airport.kr/fileroot/aac/KAL_logo.png"
+                  },
+                  {
+                    "offerid": 2,
+                    "itineraries": [
+                      {
+                        "duration": "20H 10M",
+                        "stop": "1",
+                        "segments": [
+                          {
+                            "daparture": {
+                              "city": "Seoul",
+                              "date": "2019-11-01 23:40:00"
+                            },
+                            "arrival": {
+                              "city": "advanced",
+                              "date": "2019-11-02 03:00:00"
+                            },
+                            "duration": "04H 10M"
+                          },
+                          {
+                            "daparture": {
+                              "city": "advanced",
+                              "date": "2019-11-02 03:00:00"
+                            },
+                            "arrival": {
+                              "city": "London",
+                              "date": "2019-11-02 21:00:00"
+                            },
+                            "duration": "13H 10M"
+                          }
+                        ]
+                      },
+                      {
+                        "duration": "20H 10M",
+                        "stop": "1",
+                        "segments": [
+                          {
+                            "daparture": {
+                              "city": "London",
+                              "date": "2019-11-01 23:40:00"
+                            },
+                            "arrival": {
+                              "city": "advanced",
+                              "date": "2019-11-02 03:00:00"
+                            },
+                            "duration": "04H 10M"
+                          },
+                          {
+                            "daparture": {
+                              "city": "advanced",
+                              "date": "2019-11-02 03:00:00"
+                            },
+                            "arrival": {
+                              "city": "Seoul",
+                              "date": "2019-11-02 21:00:00"
+                            },
+                            "duration": "13H 10M"
+                          }
+                        ]
+                      }
+                    ],
+                    "price": 100000,
+                    "airline": "대한항공",
+                    "logo": "https://www.airport.kr/fileroot/aac/KAL_logo.png"
+                  },
+                  {
+                    "offerid": 3,
+                    "itineraries": [
+                      {
+                        "duration": "20H 10M",
+                        "stop": "1",
+                        "segments": [
+                          {
+                            "daparture": {
+                              "city": "Seoul",
+                              "date": "2019-11-01 23:40:00"
+                            },
+                            "arrival": {
+                              "city": "advenced",
+                              "date": "2019-11-02 03:00:00"
+                            },
+                            "duration": "04H 10M"
+                          },
+                          {
+                            "daparture": {
+                              "city": "advanced",
+                              "date": "2019-11-02 03:00:00"
+                            },
+                            "arrival": {
+                              "city": "London",
+                              "date": "2019-11-02 21:00:00"
+                            },
+                            "duration": "13H 10M"
+                          }
+                        ]
+                      },
+                      {
+                        "duration": "20H 10M",
+                        "stop": "1",
+                        "segments": [
+                          {
+                            "daparture": {
+                              "city": "London",
+                              "date": "2019-11-01 23:40:00"
+                            },
+                            "arrival": {
+                              "city": "advanced",
+                              "date": "2019-11-02 03:00:00"
+                            },
+                            "duration": "04H 10M"
+                          },
+                          {
+                            "daparture": {
+                              "city": "advanced",
+                              "date": "2019-11-02 03:00:00"
+                            },
+                            "arrival": {
+                              "city": "Seoul",
+                              "date": "2019-11-02 21:00:00"
+                            },
+                            "duration": "13H 10M"
+                          }
+                        ]
+                      }
+                    ],
+                    "price": 100000,
+                    "airline": "아시아나항공",
+                    "logo": "https://www.airport.kr/fileroot/aac/20180904113100184_0.png"
                   }
-                  nonstopsum += Number(results.data[i].price.total)
-                  nonstopcount++
-                }
-              }
+                ];
 
-              nonstopaverage = nonstopsum / nonstopcount;
-              response.estimate.nonstopflight = parseInt(nonstopaverage);
-
-              //estimate_flight 평균가격 산정 100개로 하자.
-              let sum = 0;
-              let length = 100;
-              let count = parseInt(length * 0.2);
-              //let count = 20;
-              // 250 개 다 불러왔을 때 20 ~ 100
-              // 한 80 개 불러왔을 때 0 ~ 80
-              // 0개 불러왔을 때 0
-
-              let average = 0;
-              if (results.data.length !== 0) {
-                if (results.data.length < 100) {
-                  count = 0;
-                  length = results.data.length;
-                }
-                for (let i = count; i < length; i++) {
-                  sum += Number(results.data[i].price.total);
-                }
-                average = sum / (length - count);
               } else {
-                average = 0;
-              }
-              response.estimate.flight = parseInt(average);
 
+                let flightarr = [0, 1, 2];
+                let nonstopsum = 0;
+                let nonstopcount = 0;
 
-              //상세페이지 정보
+                for (let i = 0; i < results.data.length; i++) {
+                  if (results.data[i].itineraries[0].segments.length === 1) {
+                    console.log(`[항공] [직항있음!]`);
 
-
-              for (let i = 0; i < flightarr.length; i++) {
-                let body = {};
-                index = flightarr[i];
-                body.offerid = i;
-                body.itineraries = [];
-                body.price = results.data[index].price.total;
-                let carrierCode = results.data[index].itineraries[0].segments[0].carrierCode
-
-                console.log('[항공] [carrierCode] ', carrierCode);
-                //check!!!!!!
-                //db 가서 로고, 항공사 이름 찾아옴
-                db.Carrier.findOne({
-                  where: { iatacode: carrierCode }
-                }).
-                  then((data) => {
-                    console.log(`[항공] [항공사] `, data.dataValues.airline);
-
-                    body.airline = data.dataValues.airline
-                    body.logo = data.dataValues.logo;
-                    response.details.flight.push(body);
-
-                  })
-
-                // db.Carrier.findOne({
-                //     where : {iatacode : 'KE'}
-                // }).then((data) =>{
-                //     body.test = data.dataValues.airline;
-
-                // })
-
-                let go = {}; // 가는편
-                let come = {}; // 오는편
-                body.itineraries.push(go);
-                body.itineraries.push(come);
-
-                //가는 비행기
-                go.duration = results.data[index].itineraries[0].duration;
-                go.stop = results.data[index].itineraries[0].segments.length - 1;
-                go.segments = [];
-
-                //아래 코드 리팩토링 해야함!
-
-                segment1Data = results.data[index].itineraries[0].segments[0]
-                let segment1 = {
-                  departure: {
-                    city: "Seoul",
-                    date: segment1Data.departure.at
-                  },
-                  arrival: {
-                    city: "advanced",
-                    date: segment1Data.arrival.at
-                  },
-                  duration: segment1Data.duration
-                };
-
-                go.segments.push(segment1);
-
-                //경유 없을 때 
-                if (go.stop <= 0) {
-                  go.segments[0].arrival = {
-                    city: cityName,
-                    date: segment1Data.arrival.at
+                    if (flightarr[0] === 0) {
+                      flightarr = [i, 0, 1];
+                    }
+                    nonstopsum += Number(results.data[i].price.total)
+                    nonstopcount++
                   }
                 }
 
-                if (go.stop > 0) {
-                  segment2Data = results.data[index].itineraries[0].segments[1]
+                nonstopaverage = nonstopsum / nonstopcount;
+                response.estimate.nonstopflight = parseInt(nonstopaverage);
 
-                  let segment2 = {
-                    departure: {
-                      city: "advanced",
-                      date: segment2Data.departure.at
-                    },
-                    arrival: {
-                      city: cityName,
-                      date: segment2Data.arrival.at
-                    },
-                    duration: segment2Data.duration
-                  };
-                  go.segments.push(segment2);
-                }
+                //estimate_flight 평균가격 산정 100개로 하자.
+                let sum = 0;
+                let length = 100;
+                let count = parseInt(length * 0.2);
+                //let count = 20;
+                // 250 개 다 불러왔을 때 20 ~ 100
+                // 한 80 개 불러왔을 때 0 ~ 80
+                // 0개 불러왔을 때 0
 
-                //오는 비행기
-                come.duration = results.data[index].itineraries[1].duration;
-                come.stop = results.data[index].itineraries[1].segments.length - 1;
-                come.segments = [];
-
-                //경유 있을 때 
-
-                segment3Data = results.data[index].itineraries[1].segments[0]
-                let segment3 = {
-                  departure: {
-                    city: cityName,
-                    date: segment3Data.departure.at
-                  },
-                  arrival: {
-                    city: "advanced",
-                    date: segment3Data.arrival.at
-                  },
-                  duration: segment3Data.duration
-                };
-
-                come.segments.push(segment3);
-
-                if (come.stop <= 0) {
-                  come.segments[0].arrival = {
-                    city: "Seoul",
-                    date: segment3Data.arrival.at
+                let average = 0;
+                if (results.data.length !== 0) {
+                  if (results.data.length < 100) {
+                    count = 0;
+                    length = results.data.length;
                   }
+                  for (let i = count; i < length; i++) {
+                    sum += Number(results.data[i].price.total);
+                  }
+                  average = sum / (length - count);
+                } else {
+                  average = 0;
                 }
+                response.estimate.flight = parseInt(average);
 
-                if (come.stop > 0) {
 
-                  segment4Data = results.data[index].itineraries[1].segments[1]
+                //상세페이지 정보
 
-                  let segment4 = {
+
+                for (let i = 0; i < flightarr.length; i++) {
+                  let body = {};
+                  index = flightarr[i];
+                  body.offerid = i;
+                  body.itineraries = [];
+                  body.price = results.data[index].price.total;
+                  let carrierCode = results.data[index].itineraries[0].segments[0].carrierCode
+
+                  console.log('[항공] [carrierCode] ', carrierCode);
+                  //check!!!!!!
+                  //db 가서 로고, 항공사 이름 찾아옴
+                  db.Carrier.findOne({
+                    where: { iatacode: carrierCode }
+                  }).
+                    then((data) => {
+                      console.log(`[항공] [항공사] `, data.dataValues.airline);
+
+                      body.airline = data.dataValues.airline
+                      body.logo = data.dataValues.logo;
+                      response.details.flight.push(body);
+
+                    })
+
+                  // db.Carrier.findOne({
+                  //     where : {iatacode : 'KE'}
+                  // }).then((data) =>{
+                  //     body.test = data.dataValues.airline;
+
+                  // })
+
+                  let go = {}; // 가는편
+                  let come = {}; // 오는편
+                  body.itineraries.push(go);
+                  body.itineraries.push(come);
+
+                  //가는 비행기
+                  go.duration = results.data[index].itineraries[0].duration;
+                  go.stop = results.data[index].itineraries[0].segments.length - 1;
+                  go.segments = [];
+
+                  //아래 코드 리팩토링 해야함!
+
+                  segment1Data = results.data[index].itineraries[0].segments[0]
+                  let segment1 = {
                     departure: {
-                      city: "advanced",
-                      date: segment4Data.departure.at
-                    },
-                    arrival: {
                       city: "Seoul",
-                      date: segment4Data.arrival.at
+                      date: segment1Data.departure.at
                     },
-                    duration: segment4Data.duration
+                    arrival: {
+                      city: "advanced",
+                      date: segment1Data.arrival.at
+                    },
+                    duration: segment1Data.duration
                   };
-                  come.segments.push(segment4);
+
+                  go.segments.push(segment1);
+
+                  //경유 없을 때 
+                  if (go.stop <= 0) {
+                    go.segments[0].arrival = {
+                      city: cityName,
+                      date: segment1Data.arrival.at
+                    }
+                  }
+
+                  if (go.stop > 0) {
+                    segment2Data = results.data[index].itineraries[0].segments[1]
+
+                    let segment2 = {
+                      departure: {
+                        city: "advanced",
+                        date: segment2Data.departure.at
+                      },
+                      arrival: {
+                        city: cityName,
+                        date: segment2Data.arrival.at
+                      },
+                      duration: segment2Data.duration
+                    };
+                    go.segments.push(segment2);
+                  }
+
+                  //오는 비행기
+                  come.duration = results.data[index].itineraries[1].duration;
+                  come.stop = results.data[index].itineraries[1].segments.length - 1;
+                  come.segments = [];
+
+                  //경유 있을 때 
+
+                  segment3Data = results.data[index].itineraries[1].segments[0]
+                  let segment3 = {
+                    departure: {
+                      city: cityName,
+                      date: segment3Data.departure.at
+                    },
+                    arrival: {
+                      city: "advanced",
+                      date: segment3Data.arrival.at
+                    },
+                    duration: segment3Data.duration
+                  };
+
+                  come.segments.push(segment3);
+
+                  if (come.stop <= 0) {
+                    come.segments[0].arrival = {
+                      city: "Seoul",
+                      date: segment3Data.arrival.at
+                    }
+                  }
+
+                  if (come.stop > 0) {
+
+                    segment4Data = results.data[index].itineraries[1].segments[1]
+
+                    let segment4 = {
+                      departure: {
+                        city: "advanced",
+                        date: segment4Data.departure.at
+                      },
+                      arrival: {
+                        city: "Seoul",
+                        date: segment4Data.arrival.at
+                      },
+                      duration: segment4Data.duration
+                    };
+                    come.segments.push(segment4);
+                  }
+
                 }
-
               }
-
               if (response.estimate.hotel) { // 호텔 API 로부터 정보를 다 불러와 산정이 완료된 상태라면, 위에서 정리한 항공 정보를 담아 response 를 보낸다.
                 response.estimate.total =
                   response.estimate.flight +
@@ -406,8 +594,9 @@ const getSearchKeyword = function (
 
                 db.Trend.findOne({ where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } })
                   .then(data => {
-                    console.log('data : ', data);
-                    console.log('data.--------', data.dataValues)
+                    console.log(`[검색 시 트렌드 DB 업데이트] [조합코드] keyword : ${keyword}, gender : ${gender}, iataCode : ${cityName}`)
+                    console.log('[검색 시 트렌드 DB 업데이트] [도시명 및 카운트]', data.dataValues)
+                    console.log('count : ', count);
                     let count = data.dataValues.count;
                     count = count + 1;
                     console.log('count updated : ', count);
@@ -429,7 +618,7 @@ const getSearchKeyword = function (
         {
           headers: {
             Accept: "application/json",
-            "User-Key": ZOMATO_API_KEY
+            "User-Key": ZOMATO_API_KEY.slice(0, ZOMATO_API_KEY.length - 1)
           }
         }
       )
@@ -442,7 +631,7 @@ const getSearchKeyword = function (
               headers: {
                 Accept: "application/json",
                 // "User-Key": "b8cc3b8b0a85afed047f030fb52dc15f"
-                "User-Key": ZOMATO_API_KEY
+                "User-Key": ZOMATO_API_KEY.slice(0, ZOMATO_API_KEY.length - 1)
               }
             }
           )

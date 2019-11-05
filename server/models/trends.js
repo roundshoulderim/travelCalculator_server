@@ -28,12 +28,12 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
 
             trend.ratio = parseInt((trend.count / countSum) * 100);
 
-            console.log('trend!', trend);
+
 
             //사진 api 
             db.Apikey.findOne({ where: { api: "googlekey" } })
                 .then(data => {
-                    console.log('googlekey----', data);
+
                     var GOOGLE_KEY = data.dataValues.key
 
                     console.log(GOOGLE_KEY)
@@ -59,19 +59,19 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
                                 });
                             }
                             //  console.log(arr, arr2);
-                            console.log('arr---------', arr);
+
                             let spots = arr.slice();
                             trend.spot = spots.map(el => el = { text: el, value: 1 });
 
                             arr = arr.toString().split(" ");
-                            console.log("가공 후", arr);
-                            console.log(
-                                "가공 후",
-                                arr2
-                                    .toString()
-                                    .replace(/_/g, ", ")
-                                    .split(", ")
-                            );
+                            /*  console.log("가공 후", arr);
+                             console.log(
+                                 "가공 후",
+                                 arr2
+                                     .toString()
+                                     .replace(/_/g, ", ")
+                                     .split(", ")
+                             ); */
                             var word = [];
                             var obj = arr2.reduce((acc, cur) => {
                                 if (acc[cur]) {
@@ -81,14 +81,14 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
                                 }
                                 return acc;
                             }, {});
-                            console.log("여기!!", obj);
+                            /*  console.log("여기!!", obj); */
                             for (let value in obj) {
                                 word.push({ text: value, value: obj[value] });
                             }
                             trend.word = word;
-                            console.log(word)
-
-                            console.log('trend-----', trend)
+                            /* console.log(word)
+ */
+                            console.log('[트렌드 response]', trend);
                             callback(trend)
                         }
                     );
