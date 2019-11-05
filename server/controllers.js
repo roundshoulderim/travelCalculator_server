@@ -14,9 +14,9 @@ const getSearchKeyword = function (req, res) {
     const age = req.query.code.slice(-2)[0] + '0';
     const gender = req.query.code.slice(-1);
 
-    console.log('<controllers/calculate> keyword 잘 분해되었는지 : ', keyword);
-    console.log('<controllers/calculate> age 잘 분해되었는지 : ', age);
-    console.log('<controllers/calculate> gender 잘 분해되었는지 : ', gender);
+    // console.log('<controllers/calculate> keyword 잘 분해되었는지 : ', keyword);
+    // console.log('<controllers/calculate> age 잘 분해되었는지 : ', age);
+    // console.log('<controllers/calculate> gender 잘 분해되었는지 : ', gender);
 
     if (!cityCode || !departureDate || !arrivalDate || !cityName || !keyword || !age || !gender) {
         res.sendStatus(400);
@@ -35,9 +35,9 @@ const getTrendInfo = function (req, res) { // /trends?code=1101&attraction=Museu
     const age = req.query.code.slice(-2)[0] + '0';
     const gender = req.query.code.slice(-1);
 
-    console.log('<controllers/trends> keyword 잘 분해되었는지 : ', keyword);
-    console.log('<controllers/trends> age 잘 분해되었는지 : ', age);
-    console.log('<controllers/trends> gender 잘 분해되었는지 : ', gender);
+    // console.log('<controllers/trends> keyword 잘 분해되었는지 : ', keyword);
+    // console.log('<controllers/trends> age 잘 분해되었는지 : ', age);
+    // console.log('<controllers/trends> gender 잘 분해되었는지 : ', gender);
 
     if (!keyword || !age || !gender) {
         res.sendStatus(400);

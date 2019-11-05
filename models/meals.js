@@ -32,6 +32,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       allowNull: false,
       unique: false
+    },
+    photo: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: false
     }
   }, {
     timestamps: false,
