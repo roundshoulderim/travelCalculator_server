@@ -178,7 +178,7 @@ const getSearchKeyword = function (
                     ],
                     "price": 100000,
                     "airline": "대한항공",
-                    "logo": "https://www.airport.kr/fileroot/aac/KAL_logo.png"
+                    "logo": "https://www.airport.kr/fileroot/aac/KAL_logo.pngr"
                   },
                   {
                     "offerid": 2,
@@ -242,7 +242,7 @@ const getSearchKeyword = function (
                     ],
                     "price": 100000,
                     "airline": "대한항공",
-                    "logo": "https://www.airport.kr/fileroot/aac/KAL_logo.png"
+                    "logo": "https://www.airport.kr/fileroot/aac/KAL_logo.pngr"
                   },
                   {
                     "offerid": 3,
@@ -306,7 +306,7 @@ const getSearchKeyword = function (
                     ],
                     "price": 100000,
                     "airline": "아시아나항공",
-                    "logo": "https://www.airport.kr/fileroot/aac/20180904113100184_0.png"
+                    "logo": "https://www.airport.kr/fileroot/aac/20180904113100184_0.pngr"
                   }
                 ];
 
