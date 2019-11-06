@@ -148,7 +148,7 @@ const getSearchKeyword = function (
                         "stop": "0",
                         "segments": [
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "Seoul",
                               "date": "2019-11-01 23:40:00"
                             },
@@ -164,7 +164,7 @@ const getSearchKeyword = function (
                         "duration": "0",
                         "segments": [
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "London",
                               "date": "2019-11-03 23:40:00"
                             },
@@ -189,7 +189,7 @@ const getSearchKeyword = function (
                         "stop": "1",
                         "segments": [
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "Seoul",
                               "date": "2019-11-01 23:40:00"
                             },
@@ -200,7 +200,7 @@ const getSearchKeyword = function (
                             "duration": "04H 10M"
                           },
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "advanced",
                               "date": "2019-11-02 03:00:00"
                             },
@@ -217,7 +217,7 @@ const getSearchKeyword = function (
                         "stop": "1",
                         "segments": [
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "London",
                               "date": "2019-11-01 23:40:00"
                             },
@@ -228,7 +228,7 @@ const getSearchKeyword = function (
                             "duration": "04H 10M"
                           },
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "advanced",
                               "date": "2019-11-02 03:00:00"
                             },
@@ -253,7 +253,7 @@ const getSearchKeyword = function (
                         "stop": "1",
                         "segments": [
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "Seoul",
                               "date": "2019-11-01 23:40:00"
                             },
@@ -264,7 +264,7 @@ const getSearchKeyword = function (
                             "duration": "04H 10M"
                           },
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "advanced",
                               "date": "2019-11-02 03:00:00"
                             },
@@ -281,7 +281,7 @@ const getSearchKeyword = function (
                         "stop": "1",
                         "segments": [
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "London",
                               "date": "2019-11-01 23:40:00"
                             },
@@ -292,7 +292,7 @@ const getSearchKeyword = function (
                             "duration": "04H 10M"
                           },
                           {
-                            "daparture": {
+                            "departure": {
                               "city": "advanced",
                               "date": "2019-11-02 03:00:00"
                             },
@@ -546,7 +546,7 @@ const getSearchKeyword = function (
                     price:
                       Number(result.data[i].offers[0].price.total) * currency,
                     address: result.data[i].hotel.address.cityName + ' ' + result.data[i].hotel.address.lines[0],
-                    room: result.data[i].offers[0].room.typeEstimated.category ? result.data[i].offers[0].room.typeEstimated.category.replace(/\_/g, ` `) : "contact"
+                    room: result.data[i].offers[0].room.typeEstimated ? result.data[i].offers[0].room.typeEstimated.category.replace(/\_/g, ` `) : "contact"
                   };
                 } else {
                   if (response.details.hotel.length === 0) {
