@@ -39,7 +39,7 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
 
                     const option = {
                         query: `${keyword_string}+in+${trend.city}`, // 키워드 in 도시
-                        key: GOOGLE_KEY
+                        key: "12345"
                     };
                     request.get(
                         {
@@ -47,7 +47,15 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
                             qs: option
                         },
                         function (err, res, body) {
+
                             if (err) {
+                                console.log(err);
+                            }
+
+                            let json = JSON.parse(body); //json으로 파싱
+                            console.log(json);
+
+                            if (!json.result) {
 
                                 trend.spot = [
                                     { text: 'Giants Seat Scout Camp', value: 1 },
@@ -83,52 +91,51 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
                                     { text: 'clothing_store', value: 4 },
                                     { text: 'tourist_attraction', value: 2 }];
 
+                                console.log(trend);
                                 callback(trend);
-                                console.log(err);
-                            }
+                            } else {
 
-                            let json = JSON.parse(body); //json으로 파싱
-                            console.log(json);
-                            var arr = [];
-                            var arr2 = [];
-                            for (let i = 0; i < json.results.length; i++) {
-                                arr.push(json.results[i].name);
-                                json.results[i].types.forEach(el => {
-                                    arr2.push(el);
-                                });
-                            }
-                            //  console.log(arr, arr2);
-
-                            let spots = arr.slice();
-                            trend.spot = spots.map(el => el = { text: el, value: 1 });
-
-                            arr = arr.toString().split(" ");
-                            /*  console.log("가공 후", arr);
-                             console.log(
-                                 "가공 후",
-                                 arr2
-                                     .toString()
-                                     .replace(/_/g, ", ")
-                                     .split(", ")
-                             ); */
-                            var word = [];
-                            var obj = arr2.reduce((acc, cur) => {
-                                if (acc[cur]) {
-                                    acc[cur]++;
-                                } else {
-                                    acc[cur] = 1;
+                                var arr = [];
+                                var arr2 = [];
+                                for (let i = 0; i < json.results.length; i++) {
+                                    arr.push(json.results[i].name);
+                                    json.results[i].types.forEach(el => {
+                                        arr2.push(el);
+                                    });
                                 }
-                                return acc;
-                            }, {});
-                            /*  console.log("여기!!", obj); */
-                            for (let value in obj) {
-                                word.push({ text: value, value: obj[value] });
+                                //  console.log(arr, arr2);
+
+                                let spots = arr.slice();
+                                trend.spot = spots.map(el => el = { text: el, value: 1 });
+
+                                arr = arr.toString().split(" ");
+                                /*  console.log("가공 후", arr);
+                                 console.log(
+                                     "가공 후",
+                                     arr2
+                                         .toString()
+                                         .replace(/_/g, ", ")
+                                         .split(", ")
+                                 ); */
+                                var word = [];
+                                var obj = arr2.reduce((acc, cur) => {
+                                    if (acc[cur]) {
+                                        acc[cur]++;
+                                    } else {
+                                        acc[cur] = 1;
+                                    }
+                                    return acc;
+                                }, {});
+                                /*  console.log("여기!!", obj); */
+                                for (let value in obj) {
+                                    word.push({ text: value, value: obj[value] });
+                                }
+                                trend.word = word;
+                                /* console.log(word)
+            */
+                                console.log('[트렌드 response]', trend);
+                                callback(trend)
                             }
-                            trend.word = word;
-                            /* console.log(word)
-        */
-                            console.log('[트렌드 response]', trend);
-                            callback(trend)
                         }
                     );
 
