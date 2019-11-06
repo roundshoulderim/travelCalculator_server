@@ -29,7 +29,6 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
             trend.ratio = parseInt((trend.count / countSum) * 100);
 
 
-
             //사진 api 
             db.Apikey.findOne({ where: { api: "googlekey" } })
                 .then(data => {
@@ -49,6 +48,42 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
                         },
                         function (err, res, body) {
                             if (err) {
+
+                                trend.spot = [
+                                    { text: 'Giants Seat Scout Camp', value: 1 },
+                                    { text: 'Camping Wilds At The Old School House', value: 1 },
+                                    { text: 'Ashworth Valley Scout Camp', value: 1 },
+                                    { text: 'Burrs Country Park Caravan and Motorhome Club Site', value: 1 },
+                                    { text: 'Camperlands Ltd', value: 1 },
+                                    { text: 'Tossa de Mar Camping Pola', value: 1 },
+                                    { text: 'GO Outdoors', value: 1 },
+                                    { text: 'Piethorne Valley Camping', value: 1 },
+                                    { text: 'YHA', value: 1 },
+                                    { text: 'Hawthorne Caravan & Camp Site', value: 1 },
+                                    { text: 'Cotswold Outdoor Manchester Deansgate', value: 1 },
+                                    { text: 'St Michael\'s Flags and Angel Meadow Park', value: 1 },
+                                    { text: 'SuperCamps at William Hulme\'s Grammar School', value: 1 },
+                                    { text: 'Rightads Classified', value: 1 },
+                                    { text: 'Well-i-Hole Farm Caravan and Camping', value: 1 },
+                                    { text: 'The Moorlands, Saddleworth', value: 1 },
+                                    { text: 'Decathlon Manchester-Eastlands', value: 1 },
+                                    { text: 'Blackley Forest', value: 1 },
+                                    { text: 'Ellis Brigham Mountain Sports', value: 1 },
+                                    { text: 'Dunham Park Scout Camp', value: 1 }];
+
+                                trend.word =
+                                    [{ text: 'campground', value: 9 },
+                                    { text: 'lodging', value: 12 },
+                                    { text: 'park', value: 11 },
+                                    { text: 'point_of_interest', value: 20 },
+                                    { text: 'establishment', value: 20 },
+                                    { text: 'rv_park', value: 3 },
+                                    { text: 'store', value: 5 },
+                                    { text: 'bicycle_store', value: 2 },
+                                    { text: 'clothing_store', value: 4 },
+                                    { text: 'tourist_attraction', value: 2 }];
+
+                                callback(trend);
                                 console.log(err);
                             }
 
@@ -91,7 +126,7 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
                             }
                             trend.word = word;
                             /* console.log(word)
- */
+        */
                             console.log('[트렌드 response]', trend);
                             callback(trend)
                         }
