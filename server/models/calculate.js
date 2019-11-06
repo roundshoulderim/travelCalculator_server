@@ -126,7 +126,7 @@ const getSearchKeyword = function (
               }
             }).then(resp => resp.json())
             .then((results) => {
-              console.log(`[항공] [총 data] 결과 없니 설마? `, results);
+              console.log(`[항공] [총 data] 결과 없니 설마? `, results.data ? results.data.length : results);
 
               if (!results.data) {
                 response.estimate.flight = 1000000;
@@ -490,31 +490,34 @@ const getSearchKeyword = function (
                   }
 
                 }
+
+                if (response.estimate.hotel) { // 호텔 API 로부터 정보를 다 불러와 산정이 완료된 상태라면, 위에서 정리한 항공 정보를 담아 response 를 보낸다.
+                  response.estimate.total =
+                    response.estimate.flight +
+                    response.estimate.hotel * day +
+                    response.estimate.restaurant * day;
+                  console.log('항공에서 response : ', response);
+
+
+                  callback(response);
+
+                  //트렌드 데이터 업데이트하기
+
+                  db.Trend.findOne({ where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } }) // DB 로부터 해당 조합의 현재 count 수를 찾는다.
+                    .then(data => {
+                      console.log(`[검색 시 트렌드 DB 업데이트] [조합코드] keyword : ${keyword}, gender : ${gender}, iataCode : ${cityName}`)
+                      console.log('[검색 시 트렌드 DB 업데이트] [도시명 및 카운트]', data.dataValues)
+                      let count = data.dataValues.count;
+                      count = count + 1; // 해당 조합의 현재 count 수에 +1 을 한다.
+
+                      db.Trend.update({ count: count }, { where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } }) // +1 된 count 수를 해당 조합에 업데이트한다.
+                    })
+
+
+                }
+
               }
-              if (response.estimate.hotel) { // 호텔 API 로부터 정보를 다 불러와 산정이 완료된 상태라면, 위에서 정리한 항공 정보를 담아 response 를 보낸다.
-                response.estimate.total =
-                  response.estimate.flight +
-                  response.estimate.hotel * day +
-                  response.estimate.restaurant * day;
-                console.log('항공에서 response : ', response);
 
-
-                callback(response);
-
-                //트렌드 데이터 업데이트하기
-
-                db.Trend.findOne({ where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } }) // DB 로부터 해당 조합의 현재 count 수를 찾는다.
-                  .then(data => {
-                    console.log(`[검색 시 트렌드 DB 업데이트] [조합코드] keyword : ${keyword}, gender : ${gender}, iataCode : ${cityName}`)
-                    console.log('[검색 시 트렌드 DB 업데이트] [도시명 및 카운트]', data.dataValues)
-                    let count = data.dataValues.count;
-                    count = count + 1; // 해당 조합의 현재 count 수에 +1 을 한다.
-
-                    db.Trend.update({ count: count }, { where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } }) // +1 된 count 수를 해당 조합에 업데이트한다.
-                  })
-
-
-              }
 
             }).catch(error => { console.log(error) });
           // 항공권 끝남
