@@ -39,7 +39,7 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
 
                     const option = {
                         query: `${keyword_string}+in+${trend.city}`, // 키워드 in 도시
-                        key: "12345"
+                        key: GOOGLE_KEY
                     };
                     request.get(
                         {
