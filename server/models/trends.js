@@ -36,7 +36,7 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
 
                     var GOOGLE_KEY = data.dataValues.key
 
-                    console.log(GOOGLE_KEY.length);
+                    console.log(GOOGLE_KEY);
 
                     const option = {
                         query: `${keyword_string}+in+${trend.city}`, // 키워드 in 도시

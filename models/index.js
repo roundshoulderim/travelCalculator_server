@@ -38,5 +38,6 @@ db.Carrier = require('./carriers')(sequelize, Sequelize);
 db.Meal = require('./meals')(sequelize, Sequelize);
 db.Apikey = require('./apikeys')(sequelize, Sequelize);
 db.Trend = require('./trends')(sequelize, Sequelize);
+db.TrendIndex = require('./trendindexes')(sequelize, Sequelize);
 
 module.exports = db;
