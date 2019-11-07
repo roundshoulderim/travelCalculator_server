@@ -77,7 +77,7 @@ const signup = function (req, res) { // id, password, gender, age, keyword
 
     signup_model.signup(id, password, gender, age, keyword, (boolean) => {
         if (boolean) {
-            res.sendStatus(200);
+            res.redirect(200, '/');
         } else {
             res.status(500).send("이미 존재하는 아이디입니다.");
         }
