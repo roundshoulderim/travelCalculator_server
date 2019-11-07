@@ -1,8 +1,12 @@
+const express = require('express');
+const bodyParser = require('body-parser');
 const calculate_model = require('./models/calculate');
 const trends_model = require('./models/trends');
+const randomtrends_model = require('./models/randomtrends');
+const signup_model = require('./models/signup');
+const signin_model = require('./models/signin');
 
 const getSearchKeyword = function (req, res) {
-    //console.log(req.query)
 
     const cityCode = req.query.cityCode; //LHR
     const departureDate = req.query.departureDate; //2019-11-01
@@ -51,5 +55,79 @@ const getTrendInfo = function (req, res) { // /trends?code=1101&attraction=Museu
 
 }
 
+const getRandomTrendInfo = function (req, res) {
 
-module.exports = { getSearchKeyword, getTrendInfo }
+    randomtrends_model.getRandomTrendInfo((data) => {
+        res.status(200).send(data)
+    })
+
+}
+
+const signup = function (req, res) { // id, password, gender, age, keyword
+    // /singup?id= &password= & gender= & age= & keyword=
+
+    console.log('controllers signup 들어왔니?');
+    console.log('controllers 에서 request 찍어봄', req.body);
+
+    var id = req.body.id;
+    var password = req.body.password;
+    var gender = req.body.gender;
+    var age = req.body.age;
+    var keyword = req.body.keyword;
+
+    signup_model.signup(id, password, gender, age, keyword, (boolean) => {
+        if (boolean) {
+            res.sendStatus(200);
+        } else {
+            res.status(500).send("이미 존재하는 아이디입니다.");
+        }
+    })
+}
+
+
+const signin = function (req, res) { // id, password
+
+    console.log('controllers_signin 들어왔니?')
+    console.log('controllers_req', req.body);
+    var id = req.body.id;
+    var password = req.body.password;
+    var sess = req.session;
+    console.log('controller에서 session', req.session)
+
+    signin_model.signin(id, password, sess, (data) => {
+
+        if (data) {
+            res.status(200).send(data);
+        } else {
+            res.status(500).send("아이디 / 패스워드 오류");
+        }
+
+    })
+}
+
+const signout = function (req, res) {
+    console.log('controllers signout req.body ?', req.body);
+
+    let session = req.session;
+    console.log('controllers signout 들어왔니 ?');
+    console.log('controllers signout 의 session 이 어떻게 생겼니?', session);
+
+    if (session.userid) {
+        console.log('session.userid 가 있다!');
+
+        session.destroy((err) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("로그아웃 성공")
+                res.redirect('/');
+            }
+        })
+
+    } else {
+        res.redirect('/');
+    }
+
+}
+
+module.exports = { getSearchKeyword, getTrendInfo, getRandomTrendInfo, signup, signin, signout }
