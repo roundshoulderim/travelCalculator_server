@@ -9,10 +9,24 @@ const bodyParser = require("body-parser");
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:3000", "http://3.15.20.155:5000"],
+  origin: ['http://localhost:3000', 'http://3.15.20.155:5000'],
   credentials: true
 }));
 
+app.all('/*', function (req, res, next) {
+  res.header(
+    'Access-Control-Allow-Origin',
+    'http://3.15.20.155:5000',
+    'http://localhost:3000'
+  );
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization, Content-Length, X-Requested-With'
+  );
+  console.log(res.getHeaders());
+  next();
+});
 
 app.use(bodyParser.json());
 app.use(session({
