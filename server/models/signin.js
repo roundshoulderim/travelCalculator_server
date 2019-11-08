@@ -85,9 +85,7 @@ JSON.parse(localStorage.getItem('object')); // { a: 'b' }
             session.gender = data.dataValues.gender;
 
             console.log('session 잘 나왔니?', session);
-
             callback(session)
-
         }).catch(err => {
             callback(false);
         })

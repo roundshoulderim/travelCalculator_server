@@ -11,9 +11,11 @@ const getSearchKeyword = function (
   age,
   gender,
   sess,
+  name,
   callback
 ) {
   //var ama = undefined;
+  console.log('******* calculate 에서의 session 도 궁금해!', sess);
   var AMADEUS_API_KEY = undefined;
   var ZOMATO_API_KEY = undefined;
 
@@ -328,8 +330,9 @@ const getSearchKeyword = function (
 
                   // 히스토리 데이터 업데이트하기
 
-                  if (sess.userid) {
-                    db.Userhistory.create({ username: sess.userid, departuredate: departure, arrivaldate: arrival, city: cityName, estimate: JSON.stringify(response.estimate), photo: historyphoto });
+
+                  if (name) {
+                    db.Userhistory.create({ username: name, departuredate: departure, arrivaldate: arrival, city: cityName, estimate: JSON.stringify(response.estimate), photo: historyphoto });
                   }
 
                   //트렌드 데이터 업데이트하기
@@ -416,9 +419,8 @@ const getSearchKeyword = function (
                       body.logo = data.dataValues.logo;
                       response.details.flight.push(body);
 
-                      if (i === 2) {
+                      if (response.estimate.total && i === 2) {
                         callback(response);
-
                       }
 
                     })
@@ -544,8 +546,9 @@ const getSearchKeyword = function (
 
                   // 히스토리 데이터 업데이트하기
 
-                  if (sess.userid) {
-                    db.Userhistory.create({ username: sess.userid, departuredate: departure, arrivaldate: arrival, city: cityName, estimate: JSON.stringify(response.estimate), photo: historyphoto });
+                  if (name) {
+
+                    db.Userhistory.create({ username: name, departuredate: departure, arrivaldate: arrival, city: cityName, estimate: JSON.stringify(response.estimate), photo: historyphoto });
                   }
 
                   //트렌드 데이터 업데이트하기
@@ -579,6 +582,13 @@ const getSearchKeyword = function (
             .then(res => res.json())
             .then(result => {
 
+              let photos = [
+                "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
+                "https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80",
+                "https://images.unsplash.com/photo-1488805990569-3c9e1d76d51c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80"
+              ]
+
+
               for (let i = 0; i < 3; i++) {
 
                 if (result.data) {
@@ -587,15 +597,14 @@ const getSearchKeyword = function (
                     response.details.hotel[i] = {
                       name: result.data[i].hotel.name,
                       rating: result.data[i].hotel.rating,
-                      photo:
-                        "http://nomad-design-lifestyle-hotel.basel-hotels.net/data/Photos/767x460/7074/707435/707435914.JPEG",
+                      photo: photos[i],
                       price:
                         Number(result.data[i].offers[0].price.total) * currency,
                       address: result.data[i].hotel.address.cityName + ' ' + result.data[i].hotel.address.lines[0],
                       room: result.data[i].offers[0].room.typeEstimated ? result.data[i].offers[0].room.typeEstimated.category.replace(/\_/g, ` `) : "contact"
                     };
-
                   }
+
                 } else {
                   if (response.details.hotel.length === 0) {
 
@@ -621,7 +630,7 @@ const getSearchKeyword = function (
 
               } else {
 
-                if (results.data.length === 0) {
+                if (result.data.length === 0) {
                   console.log(`[호텔] [API 결과 없음] estimate : 3성급 호텔 평균 가격 ${hotelaverage} 내려드림`);
                   response.estimate.hotel = hotelaverage;
                   response.estimate.hotelratings = 3;
@@ -661,8 +670,9 @@ const getSearchKeyword = function (
                   callback(response);
                 }
 
-                if (sess.userid) {
-                  db.Userhistory.create({ username: sess.userid, departuredate: departure, arrivaldate: arrial, city: cityName, estimate: JSON.stringify(response.estimate) });
+
+                if (name) {
+                  db.Userhistory.create({ username: name, departuredate: departure, arrivaldate: arrival, city: cityName, estimate: JSON.stringify(response.estimate), photo: historyphoto });
                 }
 
                 db.Trend.findOne({ where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } })

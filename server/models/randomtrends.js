@@ -62,7 +62,7 @@ async function getRandomTrendInfo(callback) {
         response.push(trend);
 
     }
-    console.log(response);
+    /* console.log(response); */
     callback(response);
 }
 
