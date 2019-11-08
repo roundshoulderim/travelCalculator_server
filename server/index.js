@@ -9,7 +9,6 @@ const bodyParser = require("body-parser");
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://3.15.20.155:5000'],
   credentials: true
 }));
 
