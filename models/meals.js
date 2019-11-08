@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: false,
     },
+    cityName: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      unique: false,
+    },
     onemeal: {
       type: DataTypes.INTEGER,
       allowNull: false,

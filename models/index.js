@@ -40,5 +40,6 @@ db.Apikey = require('./apikeys')(sequelize, Sequelize);
 db.Trend = require('./trends')(sequelize, Sequelize);
 db.TrendIndex = require('./trendindexes')(sequelize, Sequelize);
 db.Userinfo = require('./userinfos')(sequelize, Sequelize);
+db.Userhistory = require('./userhistories')(sequelize, Sequelize);
 
 module.exports = db;

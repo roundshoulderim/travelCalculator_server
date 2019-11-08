@@ -10,6 +10,7 @@ const getSearchKeyword = function (
   keyword,
   age,
   gender,
+  sess,
   callback
 ) {
   //var ama = undefined;
@@ -58,6 +59,7 @@ const getSearchKeyword = function (
 
       let currency = 0;
       let hotelaverage = 0;
+      let historyphoto;
 
       // var currencypromise = db.Currency.findOne({
       //     where : {iataCode : cityCode}
@@ -74,6 +76,7 @@ const getSearchKeyword = function (
         response.estimate.restaurant = data.dataValues.onedaymeal;
         hotelaverage = data.dataValues.hotel;
         response.cityphoto = data.dataValues.photo;
+        historyphoto = data.dataValues.photo;
       });
 
       // async function flightpromise() {
@@ -129,6 +132,7 @@ const getSearchKeyword = function (
               console.log(`[항공] [총 data] 결과 없니 설마? `, results.data ? results.data.length : results);
 
               if (!results.data) {
+                console.log('calculate 결과없다구!');
                 response.estimate.flight = 1000000;
                 response.estimate.nonstopflight = 2000000;
 
@@ -311,7 +315,37 @@ const getSearchKeyword = function (
                   }
                 ];
 
-              } else {
+                if (response.estimate.hotel) { // 호텔 API 로부터 정보를 다 불러와 산정이 완료된 상태라면, 위에서 정리한 항공 정보를 담아 response 를 보낸다.
+                  response.estimate.total =
+                    response.estimate.flight +
+                    response.estimate.hotel * day +
+                    response.estimate.restaurant * day;
+                  console.log('항공에서 response : ', response);
+
+                  if (response.details.flight.length !== 0) {
+                    callback(response);
+                  }
+
+                  // 히스토리 데이터 업데이트하기
+
+                  if (sess.userid) {
+                    db.Userhistory.create({ username: sess.userid, departuredate: departure, arrivaldate: arrival, city: cityName, estimate: JSON.stringify(response.estimate), photo: historyphoto });
+                  }
+
+                  //트렌드 데이터 업데이트하기
+
+                  db.Trend.findOne({ where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } }) // DB 로부터 해당 조합의 현재 count 수를 찾는다.
+                    .then(data => {
+                      console.log(`[검색 시 트렌드 DB 업데이트] [조합코드] keyword : ${keyword}, gender : ${gender}, iataCode : ${cityName}`)
+                      console.log('[검색 시 트렌드 DB 업데이트] [도시명 및 카운트]', data.dataValues)
+                      let count = data.dataValues.count;
+                      count = count + 1; // 해당 조합의 현재 count 수에 +1 을 한다.
+
+                      db.Trend.update({ count: count }, { where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } }) // +1 된 count 수를 해당 조합에 업데이트한다.
+                    })
+                }
+
+              } else { // 데이터가 있다면
 
                 let flightarr = [0, 1, 2];
                 let nonstopsum = 0;
@@ -375,11 +409,17 @@ const getSearchKeyword = function (
                     where: { iatacode: carrierCode }
                   }).
                     then((data) => {
+
                       console.log(`[항공] [항공사] `, data.dataValues.airline);
 
                       body.airline = data.dataValues.airline
                       body.logo = data.dataValues.logo;
                       response.details.flight.push(body);
+
+                      if (i === 2) {
+                        callback(response);
+
+                      }
 
                     })
 
@@ -498,8 +538,15 @@ const getSearchKeyword = function (
                     response.estimate.restaurant * day;
                   console.log('항공에서 response : ', response);
 
+                  if (response.details.flight.length !== 0) {
+                    callback(response);
+                  }
 
-                  callback(response);
+                  // 히스토리 데이터 업데이트하기
+
+                  if (sess.userid) {
+                    db.Userhistory.create({ username: sess.userid, departuredate: departure, arrivaldate: arrival, city: cityName, estimate: JSON.stringify(response.estimate), photo: historyphoto });
+                  }
 
                   //트렌드 데이터 업데이트하기
 
@@ -512,8 +559,6 @@ const getSearchKeyword = function (
 
                       db.Trend.update({ count: count }, { where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } }) // +1 된 count 수를 해당 조합에 업데이트한다.
                     })
-
-
                 }
 
               }
@@ -535,19 +580,22 @@ const getSearchKeyword = function (
             .then(result => {
 
               for (let i = 0; i < 3; i++) {
-                console.log(`[호텔] [amadeus response data]`, result.data.length);
 
-                if (result.data[i]) {
-                  response.details.hotel[i] = {
-                    name: result.data[i].hotel.name,
-                    rating: result.data[i].hotel.rating,
-                    photo:
-                      "http://nomad-design-lifestyle-hotel.basel-hotels.net/data/Photos/767x460/7074/707435/707435914.JPEG",
-                    price:
-                      Number(result.data[i].offers[0].price.total) * currency,
-                    address: result.data[i].hotel.address.cityName + ' ' + result.data[i].hotel.address.lines[0],
-                    room: result.data[i].offers[0].room.typeEstimated ? result.data[i].offers[0].room.typeEstimated.category.replace(/\_/g, ` `) : "contact"
-                  };
+                if (result.data) {
+                  console.log(`[호텔] [amadeus response data]`, result.data.length);
+                  if (result.data[i]) {
+                    response.details.hotel[i] = {
+                      name: result.data[i].hotel.name,
+                      rating: result.data[i].hotel.rating,
+                      photo:
+                        "http://nomad-design-lifestyle-hotel.basel-hotels.net/data/Photos/767x460/7074/707435/707435914.JPEG",
+                      price:
+                        Number(result.data[i].offers[0].price.total) * currency,
+                      address: result.data[i].hotel.address.cityName + ' ' + result.data[i].hotel.address.lines[0],
+                      room: result.data[i].offers[0].room.typeEstimated ? result.data[i].offers[0].room.typeEstimated.category.replace(/\_/g, ` `) : "contact"
+                    };
+
+                  }
                 } else {
                   if (response.details.hotel.length === 0) {
 
@@ -555,7 +603,7 @@ const getSearchKeyword = function (
                       name: "HILTON HYDE PARK",
                       rating: "4",
                       photo:
-                        "https://seoimgak.mmtcdn.com/blog/sites/default/files/images/Emirates-Palace.jpg",
+                        "https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80",
                       price: "263702",
                       address: "129 BAYSWATER RD, BAYSWATER W2 4RJ",
                       room: "PREMIUM KINGBED"
@@ -566,25 +614,38 @@ const getSearchKeyword = function (
 
               // 평균값 산정 //
 
-              if (result.data.length === 0) {
+              if (!result.data) {
                 console.log(`[호텔] [API 결과 없음] estimate : 3성급 호텔 평균 가격 ${hotelaverage} 내려드림`);
                 response.estimate.hotel = hotelaverage;
                 response.estimate.hotelratings = 3;
+
               } else {
-                let total = 0;
-                let ratings = 0;
-                let length = result.data.length;
-                result.data.forEach(el => {
-                  if (Number(el.offers[0].price.total)) {
-                    total += Number(el.offers[0].price.total);
-                    ratings += Number(el.hotel.rating);
-                  } else {
-                    length--;
-                  }
-                });
-                response.estimate.hotel = parseInt((total / length) * currency);
-                response.estimate.hotelratings = parseInt((ratings / length));
-                console.log(`[호텔] estimate : ${response.estimate.hotelratings}성급 호텔 평균 가격 ${response.estimate.hotel} 내려드림`);
+
+                if (results.data.length === 0) {
+                  console.log(`[호텔] [API 결과 없음] estimate : 3성급 호텔 평균 가격 ${hotelaverage} 내려드림`);
+                  response.estimate.hotel = hotelaverage;
+                  response.estimate.hotelratings = 3;
+
+                } else {
+
+                  let total = 0;
+                  let ratings = 0;
+                  let length = result.data.length;
+                  result.data.forEach(el => {
+                    if (Number(el.offers[0].price.total)) {
+                      total += Number(el.offers[0].price.total);
+                      ratings += Number(el.hotel.rating);
+                    } else {
+                      length--;
+                    }
+                  });
+                  response.estimate.hotel = parseInt((total / length) * currency);
+                  response.estimate.hotelratings = parseInt((ratings / length));
+                  console.log(`[호텔] estimate : ${response.estimate.hotelratings}성급 호텔 평균 가격 ${response.estimate.hotel} 내려드림`);
+
+                }
+
+
               }
 
               if (response.estimate.flight) {
@@ -594,7 +655,15 @@ const getSearchKeyword = function (
                   response.estimate.hotel * day +
                   response.estimate.restaurant * day;
                 console.log('호텔에서 response : ', response);
-                callback(response);
+
+
+                if (response.details.flight.length !== 0) {
+                  callback(response);
+                }
+
+                if (sess.userid) {
+                  db.Userhistory.create({ username: sess.userid, departuredate: departure, arrivaldate: arrial, city: cityName, estimate: JSON.stringify(response.estimate) });
+                }
 
                 db.Trend.findOne({ where: { keyword: keyword, gender: gender, age: age, iataCode: cityName } })
                   .then(data => {
