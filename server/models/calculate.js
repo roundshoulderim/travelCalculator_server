@@ -409,7 +409,7 @@ const getSearchKeyword = function (
                     where: { iatacode: carrierCode }
                   }).
                     then((data) => {
-                      console.log('db.Carrier.findOne 의 결과 data', data);
+
                       console.log(`[항공] [항공사] `, data.dataValues.airline);
 
                       body.airline = data.dataValues.airline
