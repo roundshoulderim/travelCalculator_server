@@ -78,6 +78,7 @@ JSON.parse(localStorage.getItem('object')); // { a: 'b' }
         .then(data => {
             console.log('db에서 찾아왔니?', data.dataValues)
 
+            session.isLogined = true;
             session.userid = data.dataValues.username;
             session.keyword = data.dataValues.keyword;
             session.age = data.dataValues.age;

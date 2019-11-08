@@ -139,7 +139,7 @@ const getUserHistory = function (req, res) {
     let sess = req.session;
     console.log('getuserhistory / req.session : ', req.session);
 
-    if (sess.userid) {
+    if (sess.isLogined) {
 
         console.log('getuserhistory / req.session / sess.userid 있음! : ', sess.userid);
         let username = sess.userid;
