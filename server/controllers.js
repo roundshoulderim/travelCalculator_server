@@ -134,10 +134,14 @@ const signout = function (req, res) {
 }
 
 const getUserHistory = function (req, res) {
+    console.log('getuserhistory / req : ', req);
 
     let sess = req.session;
+    console.log('getuserhistory / req.session : ', req.session);
 
     if (sess.userid) {
+
+        console.log('getuserhistory / req.session / sess.userid 있음! : ', sess.userid);
         let username = sess.userid;
         mypage_model.mypage(username, (data) => {
             res.status(200).send(data);
