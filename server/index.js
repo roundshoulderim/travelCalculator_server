@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 
 const app = express();
 
-var whitelist = ['http://travel-calculator-client.s3-website.ap-northeast-2.amazonaws.com/', 'http://localhost:3000', 'http://travel-calculator-client.s3-website.ap-northeast-2.amazonaws.com']
+var whitelist = ['http://travel-calculator-client.s3-website.ap-northeast-2.amazonaws.com/', 'http://localhost:3000', 'http://travel-calculator-client.s3-website.ap-northeast-2.amazonaws.com', 'http://localhost:3000/']
 app.use(cors({ credentials: true, origin: whitelist }));
 
 app.all('/*', function (req, res, next) {
