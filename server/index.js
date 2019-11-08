@@ -14,7 +14,7 @@ app.use(cors({ credentials: true, origin: whitelist }));
 app.all('/*', function (req, res, next) {
   res.header(
     'Access-Control-Allow-Origin',
-    'http://travel-calculator-client.s3-website.ap-northeast-2.amazonaws.com'
+    'http://travel-calculator-client.s3-website.ap-northeast-2.amazonaws.com, http://localhost:3000'
   );
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
   res.header(
