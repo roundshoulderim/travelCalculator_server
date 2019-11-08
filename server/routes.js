@@ -15,6 +15,8 @@ router.post('/signin', function (req, res) {
 });
 router.post('/signout', function (req, res) { controllers.signout(req, res) });
 
+router.get('/mypage', controllers.getUserHistory);
+
 
 
 module.exports = router;

@@ -5,6 +5,7 @@ const trends_model = require('./models/trends');
 const randomtrends_model = require('./models/randomtrends');
 const signup_model = require('./models/signup');
 const signin_model = require('./models/signin');
+const mypage_model = require('./models/mypage');
 
 const getSearchKeyword = function (req, res) {
 
@@ -18,6 +19,8 @@ const getSearchKeyword = function (req, res) {
     const age = req.query.code.slice(-2)[0] + '0';
     const gender = req.query.code.slice(-1);
 
+    var sess = req.session;
+
     // console.log('<controllers/calculate> keyword 잘 분해되었는지 : ', keyword);
     // console.log('<controllers/calculate> age 잘 분해되었는지 : ', age);
     // console.log('<controllers/calculate> gender 잘 분해되었는지 : ', gender);
@@ -26,7 +29,7 @@ const getSearchKeyword = function (req, res) {
         res.sendStatus(400);
     }
 
-    calculate_model.getSearchKeyword(cityCode, departureDate, arrivalDate, cityName, keyword, age, gender, (data) => {
+    calculate_model.getSearchKeyword(cityCode, departureDate, arrivalDate, cityName, keyword, age, gender, sess, (data) => {
         res.status(200).send(data);
     })
 };
@@ -130,4 +133,18 @@ const signout = function (req, res) {
 
 }
 
-module.exports = { getSearchKeyword, getTrendInfo, getRandomTrendInfo, signup, signin, signout }
+const getUserHistory = function (req, res) {
+
+    let sess = req.session;
+
+    if (sess.userid) {
+        let username = sess.userid;
+        mypage_model.mypage(username, (data) => {
+            res.status(200).send(data);
+        })
+    } else {
+        res.status(500).send("로그인이 필요한 페이지입니다.");
+    }
+}
+
+module.exports = { getSearchKeyword, getTrendInfo, getRandomTrendInfo, signup, signin, signout, getUserHistory }

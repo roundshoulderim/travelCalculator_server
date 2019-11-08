@@ -17,7 +17,7 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
     db.Trend.findAll({ where: searchOption, order: [['count', 'DESC']], attributes: ['iataCode', 'count'] })
         .then(result => {
             var trend = {};
-            trend.city = result[0].dataValues.iataCode
+            trend.city = result[0].dataValues.iataCode; //London (LHR)
             trend.count = result[0].dataValues.count;
 
             let countSum = 0;
@@ -28,6 +28,10 @@ const getTrendInfo = function (keyword, age, gender, keyword_string, callback) {
 
             trend.ratio = parseInt((trend.count / countSum) * 100);
 
+            db.Meal.findOne({ where: { cityName: result[0].dataValues.iataCode } })
+                .then(data => {
+                    trend.cityphoto = data.dataValues.photo;
+                })
 
             //사진 api 
             db.Apikey.findOne({ where: { api: "googlekey" } })
