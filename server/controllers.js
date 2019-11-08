@@ -14,10 +14,12 @@ const getSearchKeyword = function (req, res) {
     const arrivalDate = req.query.arrivalDate; //2019-11-08
     const cityName = req.query.cityName; //London
     /* const stop = req.query.stop; //1 */
+    const name = req.query.name;
 
     const keyword = req.query.code.length === 4 ? req.query.code.slice(0, 2) + '00' : req.query.code.slice(0, 1) + '00';
     const age = req.query.code.slice(-2)[0] + '0';
     const gender = req.query.code.slice(-1);
+
 
     var sess = req.session;
 
@@ -29,7 +31,7 @@ const getSearchKeyword = function (req, res) {
         res.sendStatus(400);
     }
 
-    calculate_model.getSearchKeyword(cityCode, departureDate, arrivalDate, cityName, keyword, age, gender, sess, (data) => {
+    calculate_model.getSearchKeyword(cityCode, departureDate, arrivalDate, cityName, keyword, age, gender, sess, name, (data) => {
         res.status(200).send(data);
     })
 };
@@ -99,6 +101,7 @@ const signin = function (req, res) { // id, password
 
     signin_model.signin(id, password, sess, (data) => {
 
+        console.log('singin 의 data 는 뭐니?', data);
         if (data) {
             res.status(200).send(data);
         } else {
@@ -115,31 +118,32 @@ const signout = function (req, res) {
     console.log('controllers signout 들어왔니 ?');
     console.log('controllers signout 의 session 이 어떻게 생겼니?', session);
 
-    if (session.userid) {
+    if (session.isLogined) {
         console.log('session.userid 가 있다!');
 
         session.destroy((err) => {
             if (err) {
                 console.log(err);
+                res.sendStatus(500);
             } else {
                 console.log("로그아웃 성공")
-                res.redirect('/');
+                res.sendStatus(200);
             }
         })
 
     } else {
-        res.redirect('/');
+        res.sendStatus(200);
     }
 
 }
 
 const getUserHistory = function (req, res) {
-    console.log('getuserhistory / req : ', req);
+    /* console.log('getuserhistory / req : ', req); */
 
     let sess = req.session;
     console.log('getuserhistory / req.session : ', req.session);
 
-    if (sess.isLogined) {
+    if (req.session.userid) {
 
         console.log('getuserhistory / req.session / sess.userid 있음! : ', sess.userid);
         let username = sess.userid;
