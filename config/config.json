@@ -1,0 +1,29 @@
+{
+  "development": {
+    "username": "admin",
+    "password": "travelflight",
+    "database": "travelcalculator",
+    "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
+    "port": "13306",
+    "dialect": "mysql",
+    "operatorsAliases": false
+  },
+  "test": {
+    "username": "admin",
+    "password": "travelflight",
+    "database": "travelcalculator",
+    "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
+    "port": "13306",
+    "dialect": "mysql",
+    "operatorsAliases": false
+  },
+  "production": {
+    "username": "admin",
+    "password": "travelflight",
+    "database": "travelcalculator",
+    "host": "travel-calculator-db.cxcx72nawcwf.us-east-2.rds.amazonaws.com",
+    "port": "13306",
+    "dialect": "mysql",
+    "operatorsAliases": false
+  }
+}
